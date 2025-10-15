@@ -19,14 +19,12 @@ export const fetchNotes = async (
   params: apiParams = {},
 ): Promise<ApiResponse> => {
   const { data } = await apiClient.get<ApiResponse>('/notes', { params });
-  console.log('🚀 | data:', data);
 
   return data;
 };
 // GET by Id
 export const getNoteById = async (id: string): Promise<Note> => {
   const { data } = await apiClient.get<Note>(`/notes/${id}`);
-  console.log('🚀 | data:', data);
 
   return data;
 };
@@ -34,14 +32,12 @@ export const getNoteById = async (id: string): Promise<Note> => {
 // POST
 export const createNote = async (note: Note): Promise<Note> => {
   const { data } = await apiClient.post<Note>('/notes', note);
-  console.log('🚀 | data:', data);
 
   return data;
 };
 // PATCH
 export const updateNote = async (note: Note): Promise<Note> => {
   const { data } = await apiClient.patch<Note>(`/notes/${note.id}`, note);
-  console.log('🚀 | data:', data);
 
   return data;
 };
