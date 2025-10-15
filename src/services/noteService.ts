@@ -1,4 +1,4 @@
-import type { Note } from '../types/note';
+import type { Note, NoteCreate } from '../types/note';
 import { apiClient } from './client';
 
 export interface ApiResponse {
@@ -30,7 +30,7 @@ export const getNoteById = async (id: string): Promise<Note> => {
 };
 
 // POST
-export const createNote = async (note: Note): Promise<Note> => {
+export const createNote = async (note: NoteCreate): Promise<Note> => {
   const { data } = await apiClient.post<Note>('/notes', note);
 
   return data;

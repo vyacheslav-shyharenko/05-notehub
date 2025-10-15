@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import type { Note } from '../../types/note';
+import type { NoteCreate } from '../../types/note';
 import NoteForm from '../NoteForm/NoteForm';
 import './Modal.module.css';
 import css from './Modal.module.css';
 
 interface ModalProps {
   onClose: () => void;
-  onSubmit: (values: Note) => void;
+  onSubmit: (values: NoteCreate) => void;
 }
 
 const Modal = ({ onClose, onSubmit }: ModalProps) => {
