@@ -2,11 +2,10 @@ import './SearchBox.module.css';
 import css from './SearchBox.module.css';
 
 interface SearchBoxProps {
-  search: string;
   setSearch: (e: string) => void;
 }
 
-const SearchBox = ({ search, setSearch }: SearchBoxProps) => {
+const SearchBox = ({ setSearch }: SearchBoxProps) => {
   return (
     <>
       <input
@@ -14,7 +13,6 @@ const SearchBox = ({ search, setSearch }: SearchBoxProps) => {
         className={css.input}
         type="text"
         placeholder="Search notes"
-        value={search}
       />
     </>
   );

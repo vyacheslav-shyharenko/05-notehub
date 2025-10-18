@@ -1,14 +1,10 @@
-import {
-  keepPreviousData,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
-import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { useToggle } from '../../hooks/useToggle';
-import { createNote, deleteNote, fetchNotes } from '../../services/noteService';
+import { fetchNotes } from '../../services/noteService';
 import Modal from '../Modal/Modal';
+import NoteForm from '../NoteForm/NoteForm';
 import NoteList from '../NoteList/NoteList';
 import Pagination from '../Pagination/Pagination';
 import SearchBox from '../SearchBox/SearchBox';
@@ -30,63 +26,61 @@ const App = () => {
 
   const [isOpen, toggle] = useToggle(false);
 
-  const queryClient = useQueryClient();
-
-  const { data, isSuccess } = useQuery({
+  const queryOptions = {
     queryKey: ['notes', params.page, debouncedSearch],
-    queryFn: () => {
-      return fetchNotes({ ...params, search: debouncedSearch });
-    },
-    placeholderData: keepPreviousData,
-  });
+    queryFn: () =>
+      fetchNotes({
+        ...params,
+      }),
+    keepPreviousData: true,
+  };
 
-  const addNote = useMutation({
-    mutationFn: createNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-      toggle();
-    },
-  });
+  useEffect(() => {
+    setParams((prev) => ({
+      ...prev,
+      page: 1,
+      search: debouncedSearch,
+    }));
+  }, [debouncedSearch]);
 
-  const removeNote = useMutation({
-    mutationFn: deleteNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-    },
-  });
+  const { data, isSuccess } = useQuery(queryOptions);
 
   const { notes = [], totalPages = 1 } = data ?? {};
 
   const handlePageChange = ({ selected }: { selected: number }) => {
-    setParams((prev) => ({ ...prev, page: selected + 1 }));
+    setParams((prev) => ({
+      ...prev,
+      page: selected + 1,
+    }));
   };
 
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        <SearchBox search={search} setSearch={setSearch} />
+        <SearchBox setSearch={setSearch} />
+
         {totalPages > 1 && (
           <Pagination
-            pageParams={params}
+            currentPage={params.page}
             totalPages={totalPages}
             onChangePage={handlePageChange}
           />
         )}
+
         <button onClick={toggle} className={css.button}>
           Create note +
         </button>
       </header>
       {isSuccess && (
         <>
-          <NoteList
-            notes={notes}
-            deleteNote={(id: string) => removeNote.mutate(id)}
-          />
+          <NoteList notes={notes} />
         </>
       )}
 
       {isOpen && (
-        <Modal onClose={toggle} onSubmit={(values) => addNote.mutate(values)} />
+        <Modal onClose={toggle}>
+          <NoteForm onCancel={toggle} />
+        </Modal>
       )}
     </div>
   );

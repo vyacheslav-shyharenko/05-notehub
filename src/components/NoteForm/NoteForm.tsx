@@ -1,6 +1,8 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import type { NoteCreate } from '../../types/note';
+import { createNote } from '../../services/noteService';
+import type { NoteCreate, TypeTag } from '../../types/note';
 import css from './NoteForm.module.css';
 
 const validationSchema = Yup.object({
@@ -16,21 +18,32 @@ const validationSchema = Yup.object({
 
 interface NoteFormProps {
   onCancel: () => void;
-  onSubmit: (values: NoteCreate) => void;
 }
 
-export default function NoteForm({ onCancel, onSubmit }: NoteFormProps) {
+export default function NoteForm({ onCancel }: NoteFormProps) {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: createNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+    },
+  });
+
+  const initialValues = {
+    title: '',
+    content: '',
+    tag: '' as TypeTag,
+  };
+
   return (
-    <Formik
-      initialValues={{
-        title: '',
-        content: '',
-        tag: '',
-      }}
+    <Formik<NoteCreate>
+      initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={(values, { resetForm }) => {
-        onSubmit(values);
+        mutation.mutate(values);
         resetForm();
+        onCancel();
       }}
     >
       {({ isSubmitting }) => (

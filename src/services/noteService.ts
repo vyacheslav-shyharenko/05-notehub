@@ -23,11 +23,11 @@ export const fetchNotes = async (
   return data;
 };
 // GET by Id
-export const getNoteById = async (id: string): Promise<Note> => {
-  const { data } = await apiClient.get<Note>(`/notes/${id}`);
+// export const getNoteById = async (id: string): Promise<Note> => {
+//   const { data } = await apiClient.get<Note>(`/notes/${id}`);
 
-  return data;
-};
+//   return data;
+// };
 
 // POST
 export const createNote = async (note: NoteCreate): Promise<Note> => {
@@ -36,13 +36,14 @@ export const createNote = async (note: NoteCreate): Promise<Note> => {
   return data;
 };
 // PATCH
-export const updateNote = async (note: Note): Promise<Note> => {
-  const { data } = await apiClient.patch<Note>(`/notes/${note.id}`, note);
+// export const updateNote = async (note: Note): Promise<Note> => {
+//   const { data } = await apiClient.patch<Note>(`/notes/${note.id}`, note);
 
-  return data;
-};
+//   return data;
+// };
 
 // DELETE
 export const deleteNote = async (id: string): Promise<void> => {
-  await apiClient.delete(`/notes/${id}`);
+  const { data } = await apiClient.delete(`/notes/${id}`);
+  return data;
 };
