@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { useToggle } from '../../hooks/useToggle';
 import { fetchNotes } from '../../services/noteService';
@@ -26,24 +26,11 @@ const App = () => {
 
   const [isOpen, toggle] = useToggle(false);
 
-  const queryOptions = {
+  const { data, isSuccess } = useQuery({
     queryKey: ['notes', params.page, debouncedSearch],
-    queryFn: () =>
-      fetchNotes({
-        ...params,
-      }),
-    keepPreviousData: true,
-  };
-
-  useEffect(() => {
-    setParams((prev) => ({
-      ...prev,
-      page: 1,
-      search: debouncedSearch,
-    }));
-  }, [debouncedSearch]);
-
-  const { data, isSuccess } = useQuery(queryOptions);
+    queryFn: () => fetchNotes(params),
+    placeholderData: (previousData) => previousData,
+  });
 
   const { notes = [], totalPages = 1 } = data ?? {};
 

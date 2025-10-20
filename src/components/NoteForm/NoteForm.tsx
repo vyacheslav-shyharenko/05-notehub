@@ -27,6 +27,7 @@ export default function NoteForm({ onCancel }: NoteFormProps) {
     mutationFn: createNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
+      onCancel();
     },
   });
 
@@ -43,7 +44,6 @@ export default function NoteForm({ onCancel }: NoteFormProps) {
       onSubmit={(values, { resetForm }) => {
         mutation.mutate(values);
         resetForm();
-        onCancel();
       }}
     >
       {({ isSubmitting }) => (
