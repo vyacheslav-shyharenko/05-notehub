@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { useToggle } from '../../hooks/useToggle';
 import { fetchNotes } from '../../services/noteService';
@@ -8,26 +8,29 @@ import NoteForm from '../NoteForm/NoteForm';
 import NoteList from '../NoteList/NoteList';
 import Pagination from '../Pagination/Pagination';
 import SearchBox from '../SearchBox/SearchBox';
-import './App.module.css';
 import css from './App.module.css';
 
 const App = () => {
   const [params, setParams] = useState({
     page: 1,
-
     perPage: 12,
-
     search: '',
   });
 
   const [search, setSearch] = useState('');
-
-  const [debouncedSearch] = useDebounce(search, 500); //
-
+  const [debouncedSearch] = useDebounce(search, 500);
   const [isOpen, toggle] = useToggle(false);
 
+  useEffect(() => {
+    setParams((prev) => ({
+      ...prev,
+      search: debouncedSearch,
+      page: 1,
+    }));
+  }, [debouncedSearch]);
+
   const { data, isSuccess } = useQuery({
-    queryKey: ['notes', params.page, debouncedSearch],
+    queryKey: ['notes', params.page, params.search],
     queryFn: () => fetchNotes(params),
     placeholderData: (previousData) => previousData,
   });
@@ -58,11 +61,8 @@ const App = () => {
           Create note +
         </button>
       </header>
-      {isSuccess && (
-        <>
-          <NoteList notes={notes} />
-        </>
-      )}
+
+      {isSuccess && <NoteList notes={notes} />}
 
       {isOpen && (
         <Modal onClose={toggle}>
